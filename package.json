@@ -4,7 +4,7 @@
   "description": "Project 2 from Hexlet. Comparing two configuration files.",
   "main": "/dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "prepublishOnly": "npm run build"
   },
@@ -23,6 +23,9 @@
   "bugs": {
     "url": "https://github.com/Mkleon/frontend-project-lvl2/issues"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
   "homepage": "https://github.com/Mkleon/frontend-project-lvl2#readme",
   "devDependencies": {
     "@babel/cli": "^7.8.3",
@@ -30,10 +33,14 @@
     "@babel/node": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
     "babel-eslint": "^10.0.3",
+    "babel-jest": "^24.9.0",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-import": "^2.20.0"
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jest": "^23.0.4",
+    "jest": "^24.9.0",
+    "jest-cli": "^24.9.0"
   },
   "dependencies": {
     "commander": "^4.1.0",

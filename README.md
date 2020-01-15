@@ -10,6 +10,12 @@ Compares two configuration files and showing a difference.
 $ make install
 ```
 
+## Run tests
+
+```sh
+$ make test
+```
+
 ## Install and run 'gendiff' command
 
 [![asciicast](https://asciinema.org/a/293667.svg)](https://asciinema.org/a/293667)
