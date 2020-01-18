@@ -1,9 +1,12 @@
 ---
 
+global:
+  - CC_TEST_REPORTER_ID=1c92d042652ecdbfabb19956e4c6d365739d7d8f286e7bd97f47f7c457962b44
+
 language: node_js
 node_js:
-	- node
+  - node
 
 script:
-	- make lint
-	- make test
+  - make lint
+  - make test
