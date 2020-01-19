@@ -19,4 +19,4 @@ script:
 after_script:
   - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.frontend.json coverage/frontend/lcov.info
   - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 1
-  - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage --id CC_TEST_REPORTER_ID; fi
+  - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi
