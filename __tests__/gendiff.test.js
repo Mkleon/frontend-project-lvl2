@@ -14,9 +14,7 @@ test('compare two JSON configs', () => {
   expect(gendiff(firstConfig, secondConfig)).toEqual(result1);
   expect(gendiff(emptyConfig, emptyConfig)).toEqual('{\n}');
   expect(gendiff(firstConfig, firstConfig)).toEqual(result2);
-});
 
-test('compare with empty config', () => {
   const result3 = fs.readFileSync(`${pathToFixtures}/result3.txt`, 'utf8');
   const result4 = fs.readFileSync(`${pathToFixtures}/result4.txt`, 'utf8');
 
