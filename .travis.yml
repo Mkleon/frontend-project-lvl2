@@ -16,4 +16,4 @@ script:
   - make test
   - make test-coverage
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build --id $CC_TEST_REPORTER_ID --exit-code $TRAVIS_TEST_RESULT
