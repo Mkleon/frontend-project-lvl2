@@ -16,4 +16,6 @@ script:
   - make test
   - make test-coverage
 after_script:
-- if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi
+  - ./cc-test-reporter format-coverage -t lcov -o coverage/codeclimate.frontend.json coverage/frontend/lcov.info
+  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 1
+  - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi
