@@ -1,26 +1,27 @@
 import fs from 'fs';
 import pathModule from 'path';
+import jsYaml from 'js-yaml';
 
 const parsers = [
   {
-    name: '.json',
+    format: '.json',
     parse: JSON.parse,
   },
   {
-    name: '.yml',
-    parse: JSON.parse,
+    format: '.yml',
+    parse: jsYaml.safeLoad,
   },
 ];
 
-const getParser = (path) => {
-  const parserName = pathModule.extname(path);
-  const parser = parsers.find(({ name }) => parserName === name);
+const getParser = (ext) => {
+  const parser = parsers.find(({ format }) => ext === format);
 
   return parser;
 };
 
 export default (path) => {
-  const data = fs.readFileSync(path);
+  const data = fs.readFileSync(path, 'utf8');
+  const ext = pathModule.extname(path);
 
-  return getParser(path).parse(data);
+  return getParser(ext).parse(data);
 };

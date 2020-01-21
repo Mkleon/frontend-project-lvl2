@@ -1,5 +1,5 @@
 ---
 host: "hexlet.io"
 timeout: 200
-proxy: "555.444.44.33",
+proxy: "555.444.44.33"
 follow: false
