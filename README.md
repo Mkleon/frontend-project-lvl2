@@ -23,3 +23,4 @@ $ make test
 ## Install and run 'gendiff' command
 
 [![asciicast](https://asciinema.org/a/293667.svg)](https://asciinema.org/a/293667)
+[![asciicast](https://asciinema.org/a/295165.svg)](https://asciinema.org/a/295165)
