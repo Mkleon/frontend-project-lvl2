@@ -1,6 +1,7 @@
 import fs from 'fs';
 import pathModule from 'path';
 import jsYaml from 'js-yaml';
+import ini from 'ini';
 
 const parsers = [
   {
@@ -10,6 +11,10 @@ const parsers = [
   {
     format: '.yml',
     parse: jsYaml.safeLoad,
+  },
+  {
+    format: '.ini',
+    parse: ini.parse,
   },
 ];
 
