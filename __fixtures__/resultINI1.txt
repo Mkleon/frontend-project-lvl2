@@ -1,0 +1,8 @@
+{
+  host: hexlet.io
++ timeout: 20
+- timeout: 130
+- proxy: 555.555.55.55
+- follow: true
++ verbose: true
+}
