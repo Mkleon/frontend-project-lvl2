@@ -28,20 +28,42 @@ const buildAST = (firstConfig, secondConfig) => {
   const allKeys = [...Object.keys(firstConfig), ...Object.keys(secondConfig)];
   const allUniqKeys = new Set(allKeys);
 
-  const ast = [
+  const states = [
     {
-      name: '',
-      state: '',
-      valueOld: '',
-      valueNew: '',
-      children: {},
+      name: 'added',
+      check: (key) => firstConfig[key] === undefined && secondConfig[key] !== undefined,
+    },
+    {
+      name: 'deleted',
+      check: (key) => firstConfig[key] !== undefined && secondConfig[key] === undefined,
+    },
+    {
+      name: 'unchanged',
+      check: (key) => (
+        (firstConfig[key] !== undefined && secondConfig[key] !== undefined)
+        && (firstConfig[key] === secondConfig[key])),
+    },
+    {
+      name: 'changed',
+      check: (key) => (
+        (firstConfig[key] !== undefined && secondConfig[key] !== undefined)
+        && (firstConfig[key] !== secondConfig[key])),
     },
   ];
 
+  const ast = [];
+
   allUniqKeys.forEach((item) => {
-    return console.log(firstConfig[item]);
+    const elem = {};
+    elem.name = item;
+
+    const state = states.find(({ check }) => check(item));
+    elem.state = state.name;
+
+    ast.push(elem);
   });
 
+  return console.log(ast);
 };
 
 export default (firstConfigPath, secondConfigPath) => {
