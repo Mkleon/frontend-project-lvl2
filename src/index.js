@@ -24,9 +24,31 @@ const compare = (firstConfig, secondConfig) => {
   return difference;
 };
 
+const buildAST = (firstConfig, secondConfig) => {
+  const allKeys = [...Object.keys(firstConfig), ...Object.keys(secondConfig)];
+  const allUniqKeys = new Set(allKeys);
+
+  const ast = [
+    {
+      name: '',
+      state: '',
+      valueOld: '',
+      valueNew: '',
+      children: {},
+    },
+  ];
+
+  allUniqKeys.forEach((item) => {
+    return console.log(firstConfig[item]);
+  });
+
+};
+
 export default (firstConfigPath, secondConfigPath) => {
   const contentFirstConfig = getContent(firstConfigPath);
   const contentSecondConfig = getContent(secondConfigPath);
+
+  buildAST(contentFirstConfig, contentSecondConfig);
 
   return compare(contentFirstConfig, contentSecondConfig);
 };
