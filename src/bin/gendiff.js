@@ -10,7 +10,7 @@ program
   .name('gendiff')
   .description('Compares two configuration files and shows a difference.')
   .version(version)
-  .option('-f, --format <type>', 'Output format')
+  .option('-f, --format [type]', 'Output format', 'json')
   .arguments('<firstConfig> <secondConfig>')
   .action(differ)
   .parse(process.argv);

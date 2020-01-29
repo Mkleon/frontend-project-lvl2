@@ -1,29 +1,6 @@
 import _ from 'lodash';
 import getContent from './parsers';
 
-const compare = (firstConfig, secondConfig) => {
-  const addedProps = Object.keys(secondConfig)
-    .filter((item) => !_.has(firstConfig, item))
-    .map((item) => `+ ${item}: ${secondConfig[item]}`);
-
-  const deletedProps = Object.keys(firstConfig)
-    .filter((item) => !_.has(secondConfig, item));
-
-  const changedAndDeleted = Object.keys(firstConfig).reduce((acc, item) => {
-    if (deletedProps.includes(item)) {
-      return [...acc, `- ${item}: ${firstConfig[item]}`];
-    }
-    if (firstConfig[item] === secondConfig[item]) {
-      return [...acc, `  ${item}: ${firstConfig[item]}`];
-    }
-    return [...acc, `+ ${item}: ${secondConfig[item]}\n- ${item}: ${firstConfig[item]}`];
-  }, []);
-
-  const difference = _.concat(['{'], changedAndDeleted, addedProps, ['}']).join('\n');
-
-  return difference;
-};
-
 const buildAST = (firstConfig, secondConfig) => {
   const allKeys = [...Object.keys(firstConfig), ...Object.keys(secondConfig)];
   const allUniqKeys = new Set(allKeys);
@@ -31,23 +8,19 @@ const buildAST = (firstConfig, secondConfig) => {
   const states = [
     {
       name: 'added',
-      check: (key) => firstConfig[key] === undefined && secondConfig[key] !== undefined,
+      check: (key) => !_.has(firstConfig, key) && _.has(secondConfig, key),
     },
     {
       name: 'deleted',
-      check: (key) => firstConfig[key] !== undefined && secondConfig[key] === undefined,
+      check: (key) => _.has(firstConfig, key) && !_.has(secondConfig, key),
     },
     {
       name: 'unchanged',
-      check: (key) => (
-        (firstConfig[key] !== undefined && secondConfig[key] !== undefined)
-        && (firstConfig[key] === secondConfig[key])),
+      check: (key) => firstConfig[key] === secondConfig[key],
     },
     {
       name: 'changed',
-      check: (key) => (
-        (firstConfig[key] !== undefined && secondConfig[key] !== undefined)
-        && (firstConfig[key] !== secondConfig[key])),
+      check: (key) => firstConfig[key] !== secondConfig[key],
     },
   ];
 
@@ -72,12 +45,25 @@ const buildAST = (firstConfig, secondConfig) => {
   return ast;
 };
 
-export default (firstConfigPath, secondConfigPath) => {
+const renderJSON = (ast) => {
+  return console.log(ast);
+};
+
+const renders = {
+  json: renderJSON,
+};
+
+const getRender = (format) => {
+  return renders[format];
+};
+
+export default (firstConfigPath, secondConfigPath, command) => {
   const contentFirstConfig = getContent(firstConfigPath);
   const contentSecondConfig = getContent(secondConfigPath);
 
   const ast = buildAST(contentFirstConfig, contentSecondConfig);
-  console.log(ast);
 
-  return compare(contentFirstConfig, contentSecondConfig);
+  const render = getRender(command.format);
+
+  return render(ast);
 };
