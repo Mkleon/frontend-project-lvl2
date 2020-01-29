@@ -32,50 +32,22 @@ const buildAST = (firstConfig, secondConfig) => {
     {
       name: 'added',
       check: (key) => firstConfig[key] === undefined && secondConfig[key] !== undefined,
-      hasChildren: (key) => (
-        firstConfig[key] instanceof Object && secondConfig[key] instanceof Object
-      ),
-      values: {
-        valueOld: () => null,
-        valueNew: (key) => secondConfig[key],
-      },
     },
     {
       name: 'deleted',
       check: (key) => firstConfig[key] !== undefined && secondConfig[key] === undefined,
-      hasChildren: (key) => (
-        firstConfig[key] instanceof Object && secondConfig[key] instanceof Object
-      ),
-      values: {
-        valueOld: (key) => firstConfig[key],
-        valueNew: () => null,
-      },
     },
     {
       name: 'unchanged',
       check: (key) => (
         (firstConfig[key] !== undefined && secondConfig[key] !== undefined)
         && (firstConfig[key] === secondConfig[key])),
-      hasChildren: (key) => (
-        firstConfig[key] instanceof Object && secondConfig[key] instanceof Object
-      ),
-      values: {
-        valueOld: (key) => firstConfig[key],
-        valueNew: (key) => secondConfig[key],
-      },
     },
     {
       name: 'changed',
       check: (key) => (
         (firstConfig[key] !== undefined && secondConfig[key] !== undefined)
         && (firstConfig[key] !== secondConfig[key])),
-      hasChildren: (key) => (
-        firstConfig[key] instanceof Object && secondConfig[key] instanceof Object
-      ),
-      values: {
-        valueOld: (key) => firstConfig[key],
-        valueNew: (key) => secondConfig[key],
-      },
     },
   ];
 
@@ -87,18 +59,15 @@ const buildAST = (firstConfig, secondConfig) => {
 
     const state = states.find(({ check }) => check(key));
     elem.state = state.name;
-    elem.hasChildren = state.hasChildren(key);
-    elem.valueOld = state.values.valueOld(key);
-    elem.valueNew = state.values.valueNew(key);
+    elem.valueOld = firstConfig[key];
+    elem.valueNew = secondConfig[key];
 
-    if (elem.hasChildren) {
-      elem.children = buildAST(elem.valueOld, elem.valueNew);
-    }
+    elem.children = (firstConfig[key] instanceof Object && secondConfig[key] instanceof Object)
+      ? buildAST(elem.valueOld, elem.valueNew)
+      : [];
 
     ast.push(elem);
   });
-
-  console.log(ast);
 
   return ast;
 };
@@ -107,7 +76,8 @@ export default (firstConfigPath, secondConfigPath) => {
   const contentFirstConfig = getContent(firstConfigPath);
   const contentSecondConfig = getContent(secondConfigPath);
 
-  buildAST(contentFirstConfig, contentSecondConfig);
+  const ast = buildAST(contentFirstConfig, contentSecondConfig);
+  console.log(ast);
 
   return compare(contentFirstConfig, contentSecondConfig);
 };
