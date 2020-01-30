@@ -50,21 +50,32 @@ const buildAST = (firstConfig, secondConfig) => {
 };
 
 const renderJSON = (node) => {
-  const views = {
-    added: (el) => [`+ ${el.name}: ${el.valueNew}`],
-    deleted: (el) => [`- ${el.name}: ${el.valueOld}`],
-    unchanged: (el) => [`  ${el.name}: ${(el.children.length === 0) ? el.valueOld : renderJSON(el.children)}`],
-    changed: (el) => [`+ ${el.name}: ${el.valueNew}`, `- ${el.name}: ${el.valueOld}`],
+  const spacesOnLevel = 2;
+
+  const iter = (acc, item, level) => {
+    const spaces = ' '.repeat((spacesOnLevel * level) + ((level - 1) * 2));
+    const spacesBeforeOpenBracket = '';
+    const spacesBeforeCloseBracket = level === 1 ? '' : (' '.repeat((spacesOnLevel * level) + ((level - 1) * 2) - spacesOnLevel));
+
+    const text2 = item.reduce((accInner, itemInner) => {
+      if (itemInner.state === 'added') {
+        return [...accInner, `${spaces}+ ${itemInner.name}: ${itemInner.valueNew}`];
+      }
+      if (itemInner.state === 'deleted') {
+        return [...accInner, `${spaces}- ${itemInner.name}: ${itemInner.valueOld}`];
+      }
+      if (itemInner.state === 'changed') {
+        return [...accInner, `${spaces}+ ${itemInner.name}: ${itemInner.valueNew}`, `${spaces}- ${itemInner.name}: ${itemInner.valueOld}`];
+      }
+      return [...accInner, `${spaces}  ${itemInner.name}: ${(itemInner.children.length === 0) ? itemInner.valueOld : iter([], itemInner.children, level + 1)}`];
+    }, acc);
+
+    return [`${spacesBeforeOpenBracket}{`, ...text2, `${spacesBeforeCloseBracket}}`].join('\n');
   };
 
-  const text = node.reduce((acc, item) => {
-    const getView = views[item.state];
-    const view = getView(item);
+  const text = [iter([], node, 1)];
 
-    return [...acc, ...view];
-  }, []);
-
-  return ['{', ...text, '}'].join('\n');
+  return text.join('\n');
 };
 
 const renders = {
