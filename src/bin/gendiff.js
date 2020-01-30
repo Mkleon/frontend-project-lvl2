@@ -12,5 +12,6 @@ program
   .version(version)
   .option('-f, --format [type]', 'Output format', 'json')
   .arguments('<firstConfig> <secondConfig>')
-  .action(differ)
-  .parse(process.argv);
+  .action(differ);
+
+program.parse(process.argv);

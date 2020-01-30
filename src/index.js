@@ -52,6 +52,14 @@ const buildAST = (firstConfig, secondConfig) => {
 const renderJSON = (node) => {
   const spacesOnLevel = 2;
 
+  const stringify = (obj, spaces) => {
+    if (obj instanceof Object) {
+      const arr = Object.keys(obj).reduce((acc, item) => [...acc, `${spaces}      ${item}: ${obj[item]}`], []);
+      return ['{', arr, `${spaces}  }`].join('\n');
+    }
+    return obj;
+  };
+
   const iter = (acc, item, level) => {
     const spaces = ' '.repeat((spacesOnLevel * level) + ((level - 1) * 2));
     const spacesBeforeOpenBracket = '';
@@ -59,13 +67,13 @@ const renderJSON = (node) => {
 
     const text2 = item.reduce((accInner, itemInner) => {
       if (itemInner.state === 'added') {
-        return [...accInner, `${spaces}+ ${itemInner.name}: ${itemInner.valueNew}`];
+        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueNew, spaces)}`];
       }
       if (itemInner.state === 'deleted') {
-        return [...accInner, `${spaces}- ${itemInner.name}: ${itemInner.valueOld}`];
+        return [...accInner, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueOld, spaces)}`];
       }
       if (itemInner.state === 'changed') {
-        return [...accInner, `${spaces}+ ${itemInner.name}: ${itemInner.valueNew}`, `${spaces}- ${itemInner.name}: ${itemInner.valueOld}`];
+        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueNew, spaces)}`, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueOld, spaces)}`];
       }
       return [...accInner, `${spaces}  ${itemInner.name}: ${(itemInner.children.length === 0) ? itemInner.valueOld : iter([], itemInner.children, level + 1)}`];
     }, acc);
@@ -78,13 +86,16 @@ const renderJSON = (node) => {
   return text.join('\n');
 };
 
+
 const renders = {
   json: renderJSON,
 };
 
+
 const getRender = (format) => {
   return renders[format];
 };
+
 
 export default (firstConfigPath, secondConfigPath, command) => {
   const contentFirstConfig = getContent(firstConfigPath);
@@ -92,10 +103,10 @@ export default (firstConfigPath, secondConfigPath, command) => {
 
   const ast = buildAST(contentFirstConfig, contentSecondConfig);
 
-  // console.log(ast);
-  const render = getRender(command.format);
+  const format = command !== undefined ? command.format : 'json';
+  const render = getRender(format);
 
-  console.log(render(ast));
+  // console.log(render(ast));
 
   return render(ast);
 };
