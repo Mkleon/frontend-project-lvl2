@@ -8,41 +8,38 @@ const buildAST = (firstConfig, secondConfig) => {
   const states = [
     {
       name: 'added',
-      check: (key) => !_.has(firstConfig, key) && _.has(secondConfig, key),
+      check: (prop) => !_.has(firstConfig, prop) && _.has(secondConfig, prop),
     },
     {
       name: 'deleted',
-      check: (key) => _.has(firstConfig, key) && !_.has(secondConfig, key),
+      check: (prop) => _.has(firstConfig, prop) && !_.has(secondConfig, prop),
     },
     {
       name: 'unchanged',
-      check: (key) => ((firstConfig[key] instanceof Object)
-        && (secondConfig[key] instanceof Object))
-        || ((!(firstConfig[key] instanceof Object)
-              || !(secondConfig[key] instanceof Object))
-            && (firstConfig[key] === secondConfig[key])),
+      check: (prop) => (firstConfig[prop] instanceof Object && secondConfig[prop] instanceof Object)
+        || firstConfig[prop] === secondConfig[prop],
     },
     {
       name: 'changed',
-      check: (key) => (!(firstConfig[key] instanceof Object)
-        || !(secondConfig[key] instanceof Object))
-        && (firstConfig[key] !== secondConfig[key]),
+      check: (prop) => firstConfig[prop] !== secondConfig[prop],
     },
   ];
 
-  const ast = sortedProps.reduce((acc, key) => {
-    const elem = {};
-    elem.name = key;
-    elem.state = states.find(({ check }) => check(key)).name;
-    elem.valueOld = firstConfig[key];
-    elem.valueNew = secondConfig[key];
+  const createElement = (name) => {
+    const valueBefore = firstConfig[name];
+    const valueAfter = secondConfig[name];
+    const hasChildren = firstConfig[name] instanceof Object && secondConfig[name] instanceof Object;
 
-    elem.children = (firstConfig[key] instanceof Object && secondConfig[key] instanceof Object)
-      ? buildAST(elem.valueOld, elem.valueNew)
-      : [];
+    return {
+      name,
+      state: states.find(({ check }) => check(name)).name,
+      valueBefore,
+      valueAfter,
+      children: hasChildren ? buildAST(valueBefore, valueAfter) : [],
+    };
+  };
 
-    return [...acc, elem];
-  }, []);
+  const ast = sortedProps.reduce((acc, prop) => [...acc, createElement(prop)], []);
 
   return ast;
 };
@@ -64,15 +61,15 @@ const renderJSON = (node) => {
 
     const text2 = item.reduce((accInner, itemInner) => {
       if (itemInner.state === 'added') {
-        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueNew, spaces)}`];
+        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueAfter, spaces)}`];
       }
       if (itemInner.state === 'deleted') {
-        return [...accInner, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueOld, spaces)}`];
+        return [...accInner, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueBefore, spaces)}`];
       }
       if (itemInner.state === 'changed') {
-        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueNew, spaces)}`, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueOld, spaces)}`];
+        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueAfter, spaces)}`, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueBefore, spaces)}`];
       }
-      return [...accInner, `${spaces}  ${itemInner.name}: ${(itemInner.children.length === 0) ? itemInner.valueOld : iter([], itemInner.children, level + 1)}`];
+      return [...accInner, `${spaces}  ${itemInner.name}: ${(itemInner.children.length === 0) ? itemInner.valueBefore : iter([], itemInner.children, level + 1)}`];
     }, acc);
 
     return ['{', ...text2, `${spacesBeforeCloseBracket}}`].join('\n');
@@ -88,9 +85,7 @@ const renders = {
   json: renderJSON,
 };
 
-const getRender = (format) => {
-  return renders[format];
-};
+const getRender = (format) => renders[format];
 
 export default (firstConfigPath, secondConfigPath, format) => {
   const contentFirstConfig = getContent(firstConfigPath);
