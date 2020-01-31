@@ -9,19 +9,23 @@ const buildAST = (firstConfig, secondConfig) => {
     {
       name: 'added',
       check: (prop) => !_.has(firstConfig, prop) && _.has(secondConfig, prop),
+      getValue: (prop) => ({ add: secondConfig[prop] }),
     },
     {
       name: 'deleted',
       check: (prop) => _.has(firstConfig, prop) && !_.has(secondConfig, prop),
+      getValue: (prop) => ({ del: firstConfig[prop] }),
     },
     {
       name: 'unchanged',
       check: (prop) => (firstConfig[prop] instanceof Object && secondConfig[prop] instanceof Object)
         || firstConfig[prop] === secondConfig[prop],
+      getValue: (prop) => ({ unchange: firstConfig[prop] }),
     },
     {
       name: 'changed',
       check: (prop) => firstConfig[prop] !== secondConfig[prop],
+      getValue: (prop) => ({ add: secondConfig[prop], del: firstConfig[prop] }),
     },
   ];
 
@@ -29,12 +33,13 @@ const buildAST = (firstConfig, secondConfig) => {
     const valueBefore = firstConfig[name];
     const valueAfter = secondConfig[name];
     const hasChildren = firstConfig[name] instanceof Object && secondConfig[name] instanceof Object;
+    const state = states.find(({ check }) => check(name));
 
     return {
       name,
-      state: states.find(({ check }) => check(name)).name,
-      valueBefore,
-      valueAfter,
+      state: state.name,
+      value: state.getValue(name),
+      hasChildren,
       children: hasChildren ? buildAST(valueBefore, valueAfter) : [],
     };
   };
@@ -44,7 +49,7 @@ const buildAST = (firstConfig, secondConfig) => {
   return ast;
 };
 
-const renderJSON = (node) => {
+const renderJSON = (tree) => {
   const indent = 2;
 
   const stringify = (obj, spaces) => {
@@ -55,27 +60,30 @@ const renderJSON = (node) => {
     return obj;
   };
 
-  const iter = (acc, item, level) => {
+  const formatters = {
+    add: '+ ',
+    del: '- ',
+    unchange: '  ',
+  };
+
+  const iter = (acc, node, level = 1) => {
     const spaces = ' '.repeat((indent * level) + ((level - 1) * 2));
     const spacesBeforeCloseBracket = level === 1 ? '' : (' '.repeat((indent * level) + ((level - 1) * 2) - indent));
 
-    const text2 = item.reduce((accInner, itemInner) => {
-      if (itemInner.state === 'added') {
-        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueAfter, spaces)}`];
-      }
-      if (itemInner.state === 'deleted') {
-        return [...accInner, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueBefore, spaces)}`];
-      }
-      if (itemInner.state === 'changed') {
-        return [...accInner, `${spaces}+ ${itemInner.name}: ${stringify(itemInner.valueAfter, spaces)}`, `${spaces}- ${itemInner.name}: ${stringify(itemInner.valueBefore, spaces)}`];
-      }
-      return [...accInner, `${spaces}  ${itemInner.name}: ${(itemInner.children.length === 0) ? itemInner.valueBefore : iter([], itemInner.children, level + 1)}`];
+    const elem = node.reduce((accInner, itemInner) => {
+      const newItem = (itemInner.hasChildren)
+        ? [`${spaces}${formatters.unchange}${itemInner.name}: ${iter([], itemInner.children, level + 1)}`]
+        : Object.keys(itemInner.value).map((item) => (
+          `${spaces}${formatters[item]}${itemInner.name}: ${stringify(itemInner.value[item], spaces)}`
+        ));
+
+      return [...accInner, ...newItem];
     }, acc);
 
-    return ['{', ...text2, `${spacesBeforeCloseBracket}}`].join('\n');
+    return ['{', ...elem, `${spacesBeforeCloseBracket}}`].join('\n');
   };
 
-  const text = [iter([], node, 1)];
+  const text = [iter([], tree, 1)];
 
   return text.join('\n');
 };
@@ -93,7 +101,8 @@ export default (firstConfigPath, secondConfigPath, format) => {
 
   const ast = buildAST(contentFirstConfig, contentSecondConfig);
 
+  // console.log(ast);
   const render = getRender(format);
-
+  // console.log(render(ast));
   return render(ast);
 };
