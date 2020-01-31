@@ -2,8 +2,8 @@ import _ from 'lodash';
 import getContent from './parsers';
 
 const buildAST = (firstConfig, secondConfig) => {
-  const allKeys = [...Object.keys(firstConfig), ...Object.keys(secondConfig)];
-  const allUniqKeys = new Set(allKeys);
+  const uniqProps = _.union([...Object.keys(firstConfig), ...Object.keys(secondConfig)]);
+  const sortedProps = uniqProps.slice().sort();
 
   const states = [
     {
@@ -30,9 +30,7 @@ const buildAST = (firstConfig, secondConfig) => {
     },
   ];
 
-  const ast = [];
-
-  allUniqKeys.forEach((key) => {
+  const ast = sortedProps.reduce((acc, key) => {
     const elem = {};
     elem.name = key;
     elem.state = states.find(({ check }) => check(key)).name;
@@ -43,14 +41,14 @@ const buildAST = (firstConfig, secondConfig) => {
       ? buildAST(elem.valueOld, elem.valueNew)
       : [];
 
-    ast.push(elem);
-  });
+    return [...acc, elem];
+  }, []);
 
   return ast;
 };
 
 const renderJSON = (node) => {
-  const spacesOnLevel = 2;
+  const indent = 2;
 
   const stringify = (obj, spaces) => {
     if (obj instanceof Object) {
@@ -61,9 +59,8 @@ const renderJSON = (node) => {
   };
 
   const iter = (acc, item, level) => {
-    const spaces = ' '.repeat((spacesOnLevel * level) + ((level - 1) * 2));
-    const spacesBeforeOpenBracket = '';
-    const spacesBeforeCloseBracket = level === 1 ? '' : (' '.repeat((spacesOnLevel * level) + ((level - 1) * 2) - spacesOnLevel));
+    const spaces = ' '.repeat((indent * level) + ((level - 1) * 2));
+    const spacesBeforeCloseBracket = level === 1 ? '' : (' '.repeat((indent * level) + ((level - 1) * 2) - indent));
 
     const text2 = item.reduce((accInner, itemInner) => {
       if (itemInner.state === 'added') {
@@ -78,7 +75,7 @@ const renderJSON = (node) => {
       return [...accInner, `${spaces}  ${itemInner.name}: ${(itemInner.children.length === 0) ? itemInner.valueOld : iter([], itemInner.children, level + 1)}`];
     }, acc);
 
-    return [`${spacesBeforeOpenBracket}{`, ...text2, `${spacesBeforeCloseBracket}}`].join('\n');
+    return ['{', ...text2, `${spacesBeforeCloseBracket}}`].join('\n');
   };
 
   const text = [iter([], node, 1)];
@@ -91,22 +88,17 @@ const renders = {
   json: renderJSON,
 };
 
-
 const getRender = (format) => {
   return renders[format];
 };
 
-
-export default (firstConfigPath, secondConfigPath, command) => {
+export default (firstConfigPath, secondConfigPath, format) => {
   const contentFirstConfig = getContent(firstConfigPath);
   const contentSecondConfig = getContent(secondConfigPath);
 
   const ast = buildAST(contentFirstConfig, contentSecondConfig);
 
-  const format = command !== undefined ? command.format : 'json';
   const render = getRender(format);
-
-  // console.log(render(ast));
 
   return render(ast);
 };

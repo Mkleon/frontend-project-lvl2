@@ -10,5 +10,5 @@ test.each(exts)('compare two configs', (ext) => {
   const firstConfig = `${pathToFixtures}/before.${ext}`;
   const secondConfig = `${pathToFixtures}/after.${ext}`;
 
-  expect(gendiff(firstConfig, secondConfig)).toEqual(result);
+  expect(gendiff(firstConfig, secondConfig, 'json')).toEqual(result);
 });

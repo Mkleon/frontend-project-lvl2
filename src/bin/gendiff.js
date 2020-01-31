@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
 import commander from 'commander';
-import differ from '..';
+import gendiff from '..';
 import { version } from '../../package.json';
 
 const program = new commander.Command();
+let first;
+let second;
 
 program
   .name('gendiff')
@@ -12,6 +14,11 @@ program
   .version(version)
   .option('-f, --format [type]', 'Output format', 'json')
   .arguments('<firstConfig> <secondConfig>')
-  .action(differ);
+  .action((firstConfig, secondConfig) => {
+    first = firstConfig;
+    second = secondConfig;
+  });
 
 program.parse(process.argv);
+
+gendiff(first, second, program.format);
