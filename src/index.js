@@ -83,9 +83,9 @@ const renderJSON = (tree) => {
     return ['{', ...elem, `${spacesBeforeCloseBracket}}`].join('\n');
   };
 
-  const text = [iter([], tree, 1)];
+  const content = [iter([], tree)];
 
-  return text.join('\n');
+  return content.join('\n');
 };
 
 
