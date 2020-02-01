@@ -60,10 +60,10 @@ const renderJSON = (tree) => {
     return obj;
   };
 
-  const formatters = {
-    add: '+ ',
-    del: '- ',
-    unchange: '  ',
+  const operations = {
+    add: '+',
+    del: '-',
+    unchange: ' ',
   };
 
   const iter = (acc, node, level = 1) => {
@@ -72,9 +72,9 @@ const renderJSON = (tree) => {
 
     const elem = node.reduce((accInner, itemInner) => {
       const newItem = (itemInner.hasChildren)
-        ? [`${spaces}${formatters.unchange}${itemInner.name}: ${iter([], itemInner.children, level + 1)}`]
+        ? [`${spaces}${operations.unchange} ${itemInner.name}: ${iter([], itemInner.children, level + 1)}`]
         : Object.keys(itemInner.value).map((item) => (
-          `${spaces}${formatters[item]}${itemInner.name}: ${stringify(itemInner.value[item], spaces)}`
+          `${spaces}${operations[item]} ${itemInner.name}: ${stringify(itemInner.value[item], spaces)}`
         ));
 
       return [...accInner, ...newItem];
