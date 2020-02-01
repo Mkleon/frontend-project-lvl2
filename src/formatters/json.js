@@ -1,5 +1,4 @@
 export default (tree) => {
-
   const stringify = (obj, spaces) => {
     if (obj instanceof Object) {
       const arr = Object.keys(obj).reduce((acc, item) => [...acc, `${spaces}      ${item}: ${obj[item]}`], []);
