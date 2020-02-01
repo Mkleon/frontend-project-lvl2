@@ -1,6 +1,6 @@
 {
   "name": "frontend-project-lvl2",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Project 2 from Hexlet. Comparing two configuration files.",
   "main": "/dist/index.js",
   "scripts": {
