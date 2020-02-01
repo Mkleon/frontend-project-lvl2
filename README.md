@@ -25,3 +25,4 @@ $ make test
 [![asciicast](https://asciinema.org/a/293667.svg)](https://asciinema.org/a/293667)
 [![asciicast](https://asciinema.org/a/295165.svg)](https://asciinema.org/a/295165)
 [![asciicast](https://asciinema.org/a/295962.svg)](https://asciinema.org/a/295962)
+[![asciicast](https://asciinema.org/a/297179.svg)](https://asciinema.org/a/297179)
