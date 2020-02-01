@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import getContent from './parsers';
-import formatter from './formatters/index';
+import formatter from './formatters';
 
 const buildAST = (firstConfig, secondConfig) => {
   const uniqProps = _.union([...Object.keys(firstConfig), ...Object.keys(secondConfig)]);

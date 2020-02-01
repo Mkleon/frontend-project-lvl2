@@ -1,37 +1,50 @@
+import _ from 'lodash';
+
+const stringify = (value) => {
+  const types = [
+    {
+      convert: (elem) => `'${elem}'`,
+      check: (elem) => typeof elem === 'string',
+    },
+    {
+      convert: (elem) => _.identity(elem),
+      check: (elem) => typeof elem === 'boolean' || typeof elem === 'number',
+    },
+    {
+      convert: () => '[complex value]',
+      check: (elem) => elem instanceof Object,
+    },
+  ];
+
+  const type = types.find(({ check }) => check(value));
+
+  return type.convert(value);
+};
+
+const decorators = {
+  added: (name, value) => `Property '${name}' was added with value: ${stringify(value.add)}`,
+  deleted: (name) => `Property '${name}' was deleted`,
+  changed: (name, value) => `Property '${name}' was changed from ${stringify(value.del)} to ${stringify(value.add)}`,
+  unchanged: () => null,
+};
+
 export default (tree) => {
-  const stringify = (obj, spaces) => {
-    if (obj instanceof Object) {
-      const arr = Object.keys(obj).reduce((acc, item) => [...acc, `${spaces}      ${item}: ${obj[item]}`], []);
-      return ['{', arr, `${spaces}  }`].join('\n');
-    }
-    return obj;
-  };
+  const iter = (acc, node, names) => {
+    const elem = node.reduce((innerAcc, item) => {
+      const {
+        name, state, value, hasChildren, children,
+      } = item;
 
-  const operations = {
-    add: '+',
-    del: '-',
-    unchange: ' ',
-  };
+      const newNames = [...names, name];
+      const newItem = hasChildren ? iter([], children, newNames) : decorators[state](newNames.join('.'), value);
 
-  const iter = (acc, node, level = 1) => {
-    const indent = 2;
-    const spaces = ' '.repeat((indent * level) + ((level - 1) * 2));
-    const spacesBeforeCloseBracket = level === 1 ? '' : (' '.repeat((indent * level) + ((level - 1) * 2) - indent));
-
-    const elem = node.reduce((accInner, itemInner) => {
-      const newItem = (itemInner.hasChildren)
-        ? [`${spaces}${operations.unchange} ${itemInner.name}: ${iter([], itemInner.children, level + 1)}`]
-        : Object.keys(itemInner.value).map((item) => (
-          `${spaces}${operations[item]} ${itemInner.name}: ${stringify(itemInner.value[item], spaces)}`
-        ));
-
-      return [...accInner, ...newItem];
+      return [...innerAcc, newItem];
     }, acc);
 
-    return ['{', ...elem, `${spacesBeforeCloseBracket}}`].join('\n');
+    return _.compact(elem).join('\n');
   };
 
-  const content = [iter([], tree)];
+  const tr = [iter([], tree, [])];
 
-  return content.join('\n');
+  return tr.join('\n');
 };
