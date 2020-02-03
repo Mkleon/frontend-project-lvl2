@@ -3,7 +3,7 @@ import _ from 'lodash';
 const stringify = (value) => {
   const types = [
     {
-      convert: (elem) => `'${elem}'`,
+      convert: (elem) => (Number.isNaN(Number(elem)) ? `'${elem}'` : Number(elem)),
       check: (elem) => typeof elem === 'string',
     },
     {
