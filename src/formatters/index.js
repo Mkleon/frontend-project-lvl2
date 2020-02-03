@@ -1,14 +1,19 @@
-import jsonFormatter from './json';
+import treeFormatter from './tree';
 import plainFormatter from './plain';
+import jsonFormatter from './json';
 
 const formatters = [
   {
-    name: 'json',
-    formate: jsonFormatter,
+    name: 'tree',
+    formate: treeFormatter,
   },
   {
     name: 'plain',
     formate: plainFormatter,
+  },
+  {
+    name: 'json',
+    formate: jsonFormatter,
   },
 ];
 
