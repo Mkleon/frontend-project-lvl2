@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import getContent from './parsers';
-import formatter from './formatters';
+import getFormatter from './formatters';
 
 const buildAST = (firstConfig, secondConfig) => {
   const uniqProps = _.union([...Object.keys(firstConfig), ...Object.keys(secondConfig)]);
@@ -50,13 +50,11 @@ const buildAST = (firstConfig, secondConfig) => {
   return ast;
 };
 
-const render = (tree, format) => formatter(format, tree);
-
 export default (firstConfigPath, secondConfigPath, format) => {
   const contentFirstConfig = getContent(firstConfigPath);
   const contentSecondConfig = getContent(secondConfigPath);
 
   const ast = buildAST(contentFirstConfig, contentSecondConfig);
 
-  return render(ast, format);
+  return getFormatter(format).formate(ast);
 };

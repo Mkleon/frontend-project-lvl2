@@ -19,8 +19,8 @@ const formatters = [
 
 const getFormatter = (type) => formatters.find(({ name }) => name === type);
 
-export default (type, tree) => {
+export default (type) => {
   const formatter = getFormatter(type);
 
-  return formatter.formate(tree);
+  return formatter;
 };
