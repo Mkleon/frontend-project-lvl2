@@ -8,4 +8,3 @@ Property 'group1.baz' was changed from 'bas' to 'bars'
 Property 'group1.nest' was changed from [complex value] to 'str'
 Property 'group2' was deleted
 Property 'group3' was added with value: [complex value]
-Property 'number1' was changed from 20 to 500
