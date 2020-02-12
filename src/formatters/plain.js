@@ -41,10 +41,8 @@ export default (tree) => {
       return [...innerAcc, newItem];
     }, acc);
 
-    return _.compact(elem).join('\n');
+    return [_.compact(elem).join('\n')];
   };
 
-  const tr = [iter([], tree, [])];
-
-  return tr.join('\n');
+  return iter([], tree, []).join('\n');
 };
