@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import fs from 'fs';
+import pathModule from 'path';
 import getContent from './parsers';
 import render from './formatters';
 
@@ -50,11 +52,17 @@ const buildAST = (firstConfig, secondConfig) => {
   return ast;
 };
 
-export default (firstConfigPath, secondConfigPath, format) => {
-  const contentFirstConfig = getContent(firstConfigPath);
-  const contentSecondConfig = getContent(secondConfigPath);
+export default (path1, path2, format) => {
+  const data1 = fs.readFileSync(path1, 'utf8');
+  const data2 = fs.readFileSync(path2, 'utf8');
 
-  const ast = buildAST(contentFirstConfig, contentSecondConfig);
+  const ext1 = pathModule.extname(path1);
+  const ext2 = pathModule.extname(path2);
+
+  const config1 = getContent(data1, ext1);
+  const config2 = getContent(data2, ext2);
+
+  const ast = buildAST(config1, config2);
 
   return render(format, ast);
 };

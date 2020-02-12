@@ -1,5 +1,3 @@
-import fs from 'fs';
-import pathModule from 'path';
 import jsYaml from 'js-yaml';
 import ini from 'ini';
 
@@ -24,9 +22,4 @@ const getParser = (ext) => {
   return parser;
 };
 
-export default (path) => {
-  const data = fs.readFileSync(path, 'utf8');
-  const ext = pathModule.extname(path);
-
-  return getParser(ext).parse(data);
-};
+export default (data, ext) => getParser(ext).parse(data);
