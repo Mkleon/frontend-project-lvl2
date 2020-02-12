@@ -2,7 +2,7 @@
     common: {
       + follow: false
         setting1: Value 1
-      - setting2: 200
+      - setting2: creation
       + setting3: {
             key: value
         }
@@ -26,9 +26,9 @@
         }
     }
   - group2: {
-        abc: 12345
+        abc: carabas
     }
   + group3: {
-        fee: 100500
+        fee: gdr
     }
 }
