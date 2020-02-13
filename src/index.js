@@ -4,10 +4,7 @@ import pathModule from 'path';
 import getContent from './parsers';
 import render from './formatters';
 
-const buildAST = (firstConfig, secondConfig) => {
-  const uniqProps = _.union([...Object.keys(firstConfig), ...Object.keys(secondConfig)]);
-  const sortedProps = uniqProps.slice().sort();
-
+const getState = (name, firstConfig, secondConfig) => {
   const states = [
     {
       name: 'added',
@@ -32,11 +29,18 @@ const buildAST = (firstConfig, secondConfig) => {
     },
   ];
 
+  return states.find(({ check }) => check(name));
+};
+
+const buildAST = (firstConfig, secondConfig) => {
+  const uniqProps = _.union([...Object.keys(firstConfig), ...Object.keys(secondConfig)]);
+  const sortedProps = uniqProps.slice().sort();
+
   const createElement = (name) => {
     const valueBefore = firstConfig[name];
     const valueAfter = secondConfig[name];
     const hasChildren = firstConfig[name] instanceof Object && secondConfig[name] instanceof Object;
-    const state = states.find(({ check }) => check(name));
+    const state = getState(name, firstConfig, secondConfig);
 
     return {
       name,
