@@ -1,37 +1,54 @@
+import _ from 'lodash';
+
+const indent = 2;
+
+const createSpaces = (level) => ' '.repeat((indent * level) + ((level - 1) * 2));
+
+const createSpacesBeforeBracket = (level) => (
+  level === 1 ? '' : (' '.repeat((indent * level) + ((level - 1) * 2) - indent))
+);
+
+const stringify = (value, spaces) => {
+  const formats = [
+    {
+      check: (obj) => obj instanceof Object,
+      format: (obj) => {
+        const arr = Object.keys(obj).reduce((acc, item) => [...acc, `${spaces}      ${item}: ${obj[item]}`], []);
+        return ['{', arr, `${spaces}  }`].join('\n');
+      },
+    },
+    {
+      check: (obj) => !(obj instanceof Object),
+      format: (obj) => _.identity(obj),
+    },
+  ];
+
+  return formats.find(({ check }) => check(value)).format(value);
+};
+
+const decorators = {
+  added: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.value.add, createSpaces(level))}`,
+  deleted: (item, level) => `${createSpaces(level)}- ${item.name}: ${stringify(item.value.del, createSpaces(level))}`,
+  changed: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.value.add, createSpaces(level))}\n${createSpaces(level)}- ${item.name}: ${stringify(item.value.del, createSpaces(level))}`,
+  unchanged: (item, level, fn) => (
+    item.hasChildren
+      ? `${createSpaces(level)}  ${item.name}: ${fn([], item.children, level + 1)}`
+      : `${createSpaces(level)}  ${item.name}: ${stringify(item.value.unchange, createSpaces(level))}`
+  ),
+};
+
 export default (tree) => {
-  const stringify = (obj, spaces) => {
-    if (obj instanceof Object) {
-      const arr = Object.keys(obj).reduce((acc, item) => [...acc, `${spaces}      ${item}: ${obj[item]}`], []);
-      return ['{', arr, `${spaces}  }`].join('\n');
-    }
-    return obj;
-  };
-
-  const operations = {
-    add: '+',
-    del: '-',
-    unchange: ' ',
-  };
-
   const iter = (acc, node, level = 1) => {
-    const indent = 2;
-    const spaces = ' '.repeat((indent * level) + ((level - 1) * 2));
-    const spacesBeforeCloseBracket = level === 1 ? '' : (' '.repeat((indent * level) + ((level - 1) * 2) - indent));
+    const elem = node.reduce((innerAcc, item) => {
+      const { state } = item;
 
-    const elem = node.reduce((accInner, itemInner) => {
-      const newItem = (itemInner.hasChildren)
-        ? [`${spaces}${operations.unchange} ${itemInner.name}: ${iter([], itemInner.children, level + 1)}`]
-        : Object.keys(itemInner.value).map((item) => (
-          `${spaces}${operations[item]} ${itemInner.name}: ${stringify(itemInner.value[item], spaces)}`
-        ));
+      const newItem = decorators[state](item, level, iter);
 
-      return [...accInner, ...newItem];
+      return [...innerAcc, newItem];
     }, acc);
 
-    return ['{', ...elem, `${spacesBeforeCloseBracket}}`].join('\n');
+    return ['{', ...elem, `${createSpacesBeforeBracket(level)}}`].join('\n');
   };
 
-  const content = [iter([], tree)];
-
-  return content.join('\n');
+  return [iter([], tree)].join('\n');
 };
