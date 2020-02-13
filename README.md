@@ -6,7 +6,7 @@ Compares two configuration files and showing a difference.
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/fdd3dd13b8c8aba618dc/maintainability)](https://codeclimate.com/github/Mkleon/frontend-project-lvl2/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fdd3dd13b8c8aba618dc/test_coverage)](https://codeclimate.com/github/Mkleon/frontend-project-lvl2/test_coverage)
-![Node CI](https://github.com/Mkleon/frontend-project-lvl2/workflows/Node%20CI/badge.svg)
+[![Node CI](https://github.com/Mkleon/frontend-project-lvl2/workflows/Node%20CI/badge.svg)](https://github.com/Mkleon/frontend-project-lvl2/actions)
 
 ## Install
 
