@@ -32,24 +32,25 @@ const buildAST = (firstConfig, secondConfig) => {
   const allUniqProps = _.union(_.keys(firstConfig), _.keys(secondConfig));
   const sortedProps = allUniqProps.slice().sort();
 
-  const createElement = (name) => {
-    const valueBefore = firstConfig[name];
-    const valueAfter = secondConfig[name];
-    const hasChildren = firstConfig[name] instanceof Object && secondConfig[name] instanceof Object;
-    const state = getState(name, firstConfig, secondConfig);
+  const ast = sortedProps.reduce((acc, prop) => {
+    const valueBefore = firstConfig[prop];
+    const valueAfter = secondConfig[prop];
+    const hasChildren = firstConfig[prop] instanceof Object && secondConfig[prop] instanceof Object;
+    const state = getState(prop, firstConfig, secondConfig);
+
     const children = hasChildren ? buildAST(valueBefore, valueAfter) : [];
 
-    return {
-      name,
+    const newItem = {
+      name: prop,
       state: state.name,
       valueBefore,
       valueAfter,
       hasChildren,
       children,
     };
-  };
 
-  const ast = sortedProps.reduce((acc, prop) => [...acc, createElement(prop)], []);
+    return [...acc, newItem];
+  }, []);
 
   return ast;
 };
