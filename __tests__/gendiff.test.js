@@ -10,7 +10,7 @@ describe.each(exts)('compare two configs', (ext) => {
 
   const resultTree = fs.readFileSync(`${pathToFixtures}/result_tree.txt`, 'utf8');
   const resultPlain = fs.readFileSync(`${pathToFixtures}/result_plain.txt`, 'utf8');
-  const resultJSON = fs.readFileSync(`${pathToFixtures}/result_json.json`, 'utf8');
+  const resultJSON = fs.readFileSync(`${pathToFixtures}/result_json.txt`, 'utf8');
 
   test(`compare ${ext} files`, () => {
     expect(gendiff(firstConfig, secondConfig, 'tree')).toEqual(resultTree);
