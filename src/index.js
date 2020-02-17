@@ -9,23 +9,19 @@ const getState = (name, firstConfig, secondConfig) => {
     {
       name: 'added',
       check: (prop) => !_.has(firstConfig, prop) && _.has(secondConfig, prop),
-      getValue: (prop) => ({ add: secondConfig[prop] }),
     },
     {
       name: 'deleted',
       check: (prop) => _.has(firstConfig, prop) && !_.has(secondConfig, prop),
-      getValue: (prop) => ({ del: firstConfig[prop] }),
     },
     {
       name: 'unchanged',
       check: (prop) => (firstConfig[prop] instanceof Object && secondConfig[prop] instanceof Object)
         || firstConfig[prop] === secondConfig[prop],
-      getValue: (prop) => ({ unchange: firstConfig[prop] }),
     },
     {
       name: 'changed',
       check: (prop) => firstConfig[prop] !== secondConfig[prop],
-      getValue: (prop) => ({ add: secondConfig[prop], del: firstConfig[prop] }),
     },
   ];
 
@@ -46,7 +42,6 @@ const buildAST = (firstConfig, secondConfig) => {
     return {
       name,
       state: state.name,
-      // value: state.getValue(name),
       valueBefore,
       valueAfter,
       hasChildren,
