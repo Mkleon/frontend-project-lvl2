@@ -16,10 +16,10 @@ const parsers = [
   },
 ];
 
-const getParser = (dataType) => {
-  const parser = parsers.find(({ format }) => dataType === format);
+const getParser = (type) => {
+  const parser = parsers.find(({ format }) => type === format);
 
   return parser;
 };
 
-export default (data, dataType) => getParser(dataType).parse(data);
+export default (data, type) => getParser(type).parse(data);
