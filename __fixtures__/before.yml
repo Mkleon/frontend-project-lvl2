@@ -3,8 +3,8 @@
 common:
   setting1: Value 1
   setting2: creation
-  setting3: true
-  setting6:
+  setting5: true
+  setting7:
     key: value
 group1:
   baz: bas

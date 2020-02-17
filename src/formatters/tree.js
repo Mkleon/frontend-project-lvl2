@@ -27,13 +27,13 @@ const stringify = (value, spaces) => {
 };
 
 const decorators = {
-  added: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.value.add, createSpaces(level))}`,
-  deleted: (item, level) => `${createSpaces(level)}- ${item.name}: ${stringify(item.value.del, createSpaces(level))}`,
-  changed: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.value.add, createSpaces(level))}\n${createSpaces(level)}- ${item.name}: ${stringify(item.value.del, createSpaces(level))}`,
+  added: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.valueAfter, createSpaces(level))}`,
+  deleted: (item, level) => `${createSpaces(level)}- ${item.name}: ${stringify(item.valueBefore, createSpaces(level))}`,
+  changed: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.valueAfter, createSpaces(level))}\n${createSpaces(level)}- ${item.name}: ${stringify(item.valueBefore, createSpaces(level))}`,
   unchanged: (item, level, fn) => (
     item.hasChildren
       ? `${createSpaces(level)}  ${item.name}: ${fn([], item.children, level + 1)}`
-      : `${createSpaces(level)}  ${item.name}: ${stringify(item.value.unchange, createSpaces(level))}`
+      : `${createSpaces(level)}  ${item.name}: ${stringify(item.valueBefore, createSpaces(level))}`
   ),
 };
 

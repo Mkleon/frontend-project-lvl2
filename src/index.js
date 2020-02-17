@@ -41,13 +41,16 @@ const buildAST = (firstConfig, secondConfig) => {
     const valueAfter = secondConfig[name];
     const hasChildren = firstConfig[name] instanceof Object && secondConfig[name] instanceof Object;
     const state = getState(name, firstConfig, secondConfig);
+    const children = hasChildren ? buildAST(valueBefore, valueAfter) : [];
 
     return {
       name,
       state: state.name,
-      value: state.getValue(name),
+      // value: state.getValue(name),
+      valueBefore,
+      valueAfter,
       hasChildren,
-      children: hasChildren ? buildAST(valueBefore, valueAfter) : [],
+      children,
     };
   };
 

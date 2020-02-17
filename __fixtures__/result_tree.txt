@@ -3,15 +3,15 @@
       + follow: false
         setting1: Value 1
       - setting2: creation
-      + setting3: {
-            key: value
-        }
-      - setting3: true
       + setting4: blah blah
       + setting5: {
+            key: value
+        }
+      - setting5: true
+      + setting6: {
             key5: value5
         }
-        setting6: {
+        setting7: {
             key: value
           + ops: vops
         }

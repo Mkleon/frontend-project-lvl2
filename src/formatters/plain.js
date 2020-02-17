@@ -22,9 +22,9 @@ const stringify = (value) => {
 };
 
 const decorators = {
-  added: (name, value) => `Property '${name}' was added with value: ${stringify(value.add)}`,
+  added: (name, valueBefore, valueAfter) => `Property '${name}' was added with value: ${stringify(valueAfter)}`,
   deleted: (name) => `Property '${name}' was deleted`,
-  changed: (name, value) => `Property '${name}' was changed from ${stringify(value.del)} to ${stringify(value.add)}`,
+  changed: (name, valueBefore, valueAfter) => `Property '${name}' was changed from ${stringify(valueBefore)} to ${stringify(valueAfter)}`,
   unchanged: () => null,
 };
 
@@ -32,11 +32,11 @@ export default (tree) => {
   const iter = (acc, node, names) => {
     const elem = node.reduce((innerAcc, item) => {
       const {
-        name, state, value, hasChildren, children,
+        name, state, valueBefore, valueAfter, hasChildren, children,
       } = item;
 
       const newNames = [...names, name];
-      const newItem = hasChildren ? iter([], children, newNames) : decorators[state](newNames.join('.'), value);
+      const newItem = hasChildren ? iter([], children, newNames) : decorators[state](newNames.join('.'), valueBefore, valueAfter);
 
       return [...innerAcc, newItem];
     }, acc);

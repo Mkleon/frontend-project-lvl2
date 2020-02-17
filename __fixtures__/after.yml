@@ -3,12 +3,12 @@
 common:
   follow: false
   setting1: Value 1
-  setting3:
-    key: value
   setting4: blah blah
   setting5:
-    key5: value5
+    key: value
   setting6:
+    key5: value5
+  setting7:
     key: value
     ops: vops
 group1:
