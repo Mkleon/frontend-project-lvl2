@@ -29,17 +29,7 @@ const getState = (name, firstConfig, secondConfig) => {
 };
 
 const buildAST = (firstConfig, secondConfig) => {
-  const propsFirstConfig = Object.keys(firstConfig);
-  const propsSecondConfig = Object.keys(secondConfig);
-
-  const uniqPropsOfFirstConfig = propsFirstConfig.reduce((acc, item) => (
-    !acc.includes(item) ? [...acc, item] : acc
-  ), []);
-
-  const allUniqProps = propsSecondConfig.reduce((acc, item) => (
-    !acc.includes(item) ? [...acc, item] : acc
-  ), uniqPropsOfFirstConfig);
-
+  const allUniqProps = _.union(_.keys(firstConfig), _.keys(secondConfig));
   const sortedProps = allUniqProps.slice().sort();
 
   const createElement = (name) => {
