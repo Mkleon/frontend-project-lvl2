@@ -59,11 +59,11 @@ export default (path1, path2, format) => {
   const data1 = fs.readFileSync(path1, 'utf8');
   const data2 = fs.readFileSync(path2, 'utf8');
 
-  const ext1 = pathModule.extname(path1).slice(1);
-  const ext2 = pathModule.extname(path2).slice(1);
+  const type1 = pathModule.extname(path1).slice(1);
+  const type2 = pathModule.extname(path2).slice(1);
 
-  const config1 = getContent(data1, ext1);
-  const config2 = getContent(data2, ext2);
+  const config1 = getContent(data1, type1);
+  const config2 = getContent(data2, type2);
 
   const ast = buildAST(config1, config2);
 
