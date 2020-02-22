@@ -16,7 +16,7 @@ const getState = (name, firstConfig, secondConfig) => {
     },
     {
       name: 'unchanged',
-      check: (prop) => (firstConfig[prop] instanceof Object && secondConfig[prop] instanceof Object)
+      check: (prop) => (_.isObject(firstConfig[prop]) && _.isObject(secondConfig[prop]))
         || firstConfig[prop] === secondConfig[prop],
     },
     {
@@ -32,25 +32,23 @@ const buildAST = (firstConfig, secondConfig) => {
   const allUniqProps = _.union(_.keys(firstConfig), _.keys(secondConfig));
   const sortedProps = allUniqProps.slice().sort();
 
-  const ast = sortedProps.reduce((acc, prop) => {
-    const valueBefore = firstConfig[prop];
-    const valueAfter = secondConfig[prop];
-    const hasChildren = firstConfig[prop] instanceof Object && secondConfig[prop] instanceof Object;
-    const state = getState(prop, firstConfig, secondConfig);
+  const ast = sortedProps.map((name) => {
+    const valueBefore = firstConfig[name];
+    const valueAfter = secondConfig[name];
+    const hasChildren = _.isObject(firstConfig[name]) && _.isObject(secondConfig[name]);
+    const state = getState(name, firstConfig, secondConfig);
 
     const children = hasChildren ? buildAST(valueBefore, valueAfter) : [];
 
-    const newItem = {
-      name: prop,
+    return {
+      name,
       state: state.name,
       valueBefore,
       valueAfter,
       hasChildren,
       children,
     };
-
-    return [...acc, newItem];
-  }, []);
+  });
 
   return ast;
 };
