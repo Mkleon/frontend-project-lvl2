@@ -26,22 +26,20 @@ const decorators = {
   deleted: (name) => `Property '${name.join('.')}' was deleted`,
   changed: (name, value) => `Property '${name.join('.')}' was changed from ${stringify(value.valueBefore)} to ${stringify(value.valueAfter)}`,
   unchanged: () => null,
-  nested: (name, value, fn) => fn([], value, name),
+  nested: (name, value, fn) => fn(value, name),
 };
 
 export default (tree) => {
-  const iter = (acc, node, names) => {
-    const elem = node.reduce((innerAcc, item) => {
+  const iter = (node, names) => {
+    const newItem = node.map((item) => {
       const { name, state, value } = item;
-
       const newNames = [...names, name];
-      const newItem = decorators[state](newNames, value, iter);
 
-      return [...innerAcc, newItem];
-    }, acc);
+      return decorators[state](newNames, value, iter);
+    });
 
-    return [_.compact(elem).join('\n')];
+    return [_.compact(newItem).join('\n')];
   };
 
-  return iter([], tree, []).join('\n');
+  return iter(tree, []).join('\n');
 };
