@@ -7,21 +7,29 @@ import render from './formatters';
 const getState = (name, firstConfig, secondConfig) => {
   const states = [
     {
-      name: 'added',
+      state: 'added',
       check: (prop) => !_.has(firstConfig, prop) && _.has(secondConfig, prop),
+      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
     },
     {
-      name: 'deleted',
+      state: 'deleted',
       check: (prop) => _.has(firstConfig, prop) && !_.has(secondConfig, prop),
+      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
     },
     {
-      name: 'unchanged',
-      check: (prop) => (_.isObject(firstConfig[prop]) && _.isObject(secondConfig[prop]))
-        || firstConfig[prop] === secondConfig[prop],
+      state: 'nested',
+      check: (prop) => _.isObject(firstConfig[prop]) && _.isObject(secondConfig[prop]),
+      getValue: (prop, fn) => fn(firstConfig[prop], secondConfig[prop]),
     },
     {
-      name: 'changed',
+      state: 'unchanged',
+      check: (prop) => firstConfig[prop] === secondConfig[prop],
+      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
+    },
+    {
+      state: 'changed',
       check: (prop) => firstConfig[prop] !== secondConfig[prop],
+      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
     },
   ];
 
@@ -33,21 +41,9 @@ const buildAST = (firstConfig, secondConfig) => {
   const sortedProps = allUniqProps.slice().sort();
 
   const ast = sortedProps.map((name) => {
-    const valueBefore = firstConfig[name];
-    const valueAfter = secondConfig[name];
-    const hasChildren = _.isObject(firstConfig[name]) && _.isObject(secondConfig[name]);
-    const state = getState(name, firstConfig, secondConfig);
+    const { state, getValue } = getState(name, firstConfig, secondConfig);
 
-    const children = hasChildren ? buildAST(valueBefore, valueAfter) : [];
-
-    return {
-      name,
-      state: state.name,
-      valueBefore,
-      valueAfter,
-      hasChildren,
-      children,
-    };
+    return { name, state, value: getValue(name, buildAST) };
   });
 
   return ast;
