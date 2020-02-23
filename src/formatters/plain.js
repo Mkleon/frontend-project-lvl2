@@ -22,21 +22,20 @@ const stringify = (value) => {
 };
 
 const decorators = {
-  added: (name, valueBefore, valueAfter) => `Property '${name}' was added with value: ${stringify(valueAfter)}`,
-  deleted: (name) => `Property '${name}' was deleted`,
-  changed: (name, valueBefore, valueAfter) => `Property '${name}' was changed from ${stringify(valueBefore)} to ${stringify(valueAfter)}`,
+  added: (name, value) => `Property '${name.join('.')}' was added with value: ${stringify(value.valueAfter)}`,
+  deleted: (name) => `Property '${name.join('.')}' was deleted`,
+  changed: (name, value) => `Property '${name.join('.')}' was changed from ${stringify(value.valueBefore)} to ${stringify(value.valueAfter)}`,
   unchanged: () => null,
+  nested: (name, value, fn) => fn([], value, name),
 };
 
 export default (tree) => {
   const iter = (acc, node, names) => {
     const elem = node.reduce((innerAcc, item) => {
-      const {
-        name, state, valueBefore, valueAfter, hasChildren, children,
-      } = item;
+      const { name, state, value } = item;
 
       const newNames = [...names, name];
-      const newItem = hasChildren ? iter([], children, newNames) : decorators[state](newNames.join('.'), valueBefore, valueAfter);
+      const newItem = decorators[state](newNames, value, iter);
 
       return [...innerAcc, newItem];
     }, acc);
