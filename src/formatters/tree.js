@@ -2,12 +2,12 @@ import _ from 'lodash';
 
 const indent = 2;
 
-const countOfSpacies = (level) => (indent * level) + ((level - 1) * 2);
+const countOfSpaces = (level) => (indent * level) + ((level - 1) * 2);
 
-const createSpaces = (level) => ' '.repeat(countOfSpacies(level));
+const createSpaces = (level) => ' '.repeat(countOfSpaces(level));
 
 const createSpacesBeforeBracket = (level) => (
-  level === 1 ? '' : (' '.repeat(countOfSpacies(level) - indent))
+  level === 1 ? '' : (' '.repeat(countOfSpaces(level) - indent))
 );
 
 const stringify = (value, spaces) => {
