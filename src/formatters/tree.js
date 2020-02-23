@@ -2,10 +2,12 @@ import _ from 'lodash';
 
 const indent = 2;
 
-const createSpaces = (level) => ' '.repeat((indent * level) + ((level - 1) * 2));
+const countOfSpacies = (level) => (indent * level) + ((level - 1) * 2);
+
+const createSpaces = (level) => ' '.repeat(countOfSpacies(level));
 
 const createSpacesBeforeBracket = (level) => (
-  level === 1 ? '' : (' '.repeat((indent * level) + ((level - 1) * 2) - indent))
+  level === 1 ? '' : (' '.repeat(countOfSpacies(level) - indent))
 );
 
 const stringify = (value, spaces) => {
@@ -27,21 +29,17 @@ const stringify = (value, spaces) => {
 };
 
 const decorators = {
-  added: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.valueAfter, createSpaces(level))}`,
-  deleted: (item, level) => `${createSpaces(level)}- ${item.name}: ${stringify(item.valueBefore, createSpaces(level))}`,
-  changed: (item, level) => `${createSpaces(level)}+ ${item.name}: ${stringify(item.valueAfter, createSpaces(level))}\n${createSpaces(level)}- ${item.name}: ${stringify(item.valueBefore, createSpaces(level))}`,
-  unchanged: (item, level, fn) => (
-    item.hasChildren
-      ? `${createSpaces(level)}  ${item.name}: ${fn([], item.children, level + 1)}`
-      : `${createSpaces(level)}  ${item.name}: ${stringify(item.valueBefore, createSpaces(level))}`
-  ),
+  added: ({ name, value }, level) => `${createSpaces(level)}+ ${name}: ${stringify(value.valueAfter, createSpaces(level))}`,
+  deleted: ({ name, value }, level) => `${createSpaces(level)}- ${name}: ${stringify(value.valueBefore, createSpaces(level))}`,
+  changed: ({ name, value }, level) => `${createSpaces(level)}+ ${name}: ${stringify(value.valueAfter, createSpaces(level))}\n${createSpaces(level)}- ${name}: ${stringify(value.valueBefore, createSpaces(level))}`,
+  unchanged: ({ name, value }, level) => `${createSpaces(level)}  ${name}: ${stringify(value.valueBefore, createSpaces(level))}`,
+  nested: ({ name, value }, level, fn) => `${createSpaces(level)}  ${name}: ${fn([], value, level + 1)}`,
 };
 
 export default (tree) => {
   const iter = (acc, node, level = 1) => {
     const elem = node.reduce((innerAcc, item) => {
       const { state } = item;
-
       const newItem = decorators[state](item, level, iter);
 
       return [...innerAcc, newItem];
