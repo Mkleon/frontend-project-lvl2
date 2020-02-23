@@ -5,16 +5,18 @@ import getContent from './parsers';
 import render from './formatters';
 
 const getState = (name, firstConfig, secondConfig) => {
+  const getValue = (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] });
+
   const states = [
     {
       state: 'added',
       check: (prop) => !_.has(firstConfig, prop) && _.has(secondConfig, prop),
-      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
+      getValue,
     },
     {
       state: 'deleted',
       check: (prop) => _.has(firstConfig, prop) && !_.has(secondConfig, prop),
-      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
+      getValue,
     },
     {
       state: 'nested',
@@ -24,12 +26,12 @@ const getState = (name, firstConfig, secondConfig) => {
     {
       state: 'unchanged',
       check: (prop) => firstConfig[prop] === secondConfig[prop],
-      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
+      getValue,
     },
     {
       state: 'changed',
       check: (prop) => firstConfig[prop] !== secondConfig[prop],
-      getValue: (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] }),
+      getValue,
     },
   ];
 
