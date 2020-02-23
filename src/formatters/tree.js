@@ -28,11 +28,13 @@ const stringify = (value, spaces) => {
   return formats.find(({ check }) => check(value)).format(value);
 };
 
+const commonDecorator = (sign, name, value, level) => `${createSpaces(level)}${sign} ${name}: ${stringify(value, createSpaces(level))}`;
+
 const decorators = {
-  added: ({ name, value }, level) => `${createSpaces(level)}+ ${name}: ${stringify(value.valueAfter, createSpaces(level))}`,
-  deleted: ({ name, value }, level) => `${createSpaces(level)}- ${name}: ${stringify(value.valueBefore, createSpaces(level))}`,
-  changed: ({ name, value }, level) => `${createSpaces(level)}+ ${name}: ${stringify(value.valueAfter, createSpaces(level))}\n${createSpaces(level)}- ${name}: ${stringify(value.valueBefore, createSpaces(level))}`,
-  unchanged: ({ name, value }, level) => `${createSpaces(level)}  ${name}: ${stringify(value.valueBefore, createSpaces(level))}`,
+  added: ({ name, value }, level) => commonDecorator('+', name, value.valueAfter, level),
+  deleted: ({ name, value }, level) => commonDecorator('-', name, value.valueBefore, level),
+  changed: ({ name, value }, level) => [commonDecorator('+', name, value.valueAfter, level), commonDecorator('-', name, value.valueBefore, level)].join('\n'),
+  unchanged: ({ name, value }, level) => commonDecorator(' ', name, value.valueBefore, level),
   nested: ({ name, value }, level, fn) => `${createSpaces(level)}  ${name}: ${fn(value, level + 1)}`,
 };
 
