@@ -5,7 +5,11 @@ import getContent from './parsers';
 import render from './formatters';
 
 const getState = (name, firstConfig, secondConfig) => {
-  const getItem = (prop) => ({ value: { valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] } });
+  const getItem = (prop) => (
+    {
+      value: { valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] },
+    }
+  );
 
   const states = [
     {
