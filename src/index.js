@@ -52,7 +52,7 @@ const buildAST = (firstConfig, secondConfig) => {
 
     return { name, state, ...newItem };
   });
-  console.log(ast);
+
   return ast;
 };
 

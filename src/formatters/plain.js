@@ -22,10 +22,10 @@ const stringify = (value) => {
 };
 
 const decorators = {
-  added: (name, value) => `Property '${name.join('.')}' was added with value: ${stringify(value.valueAfter)}`,
+  added: (name, { value }) => `Property '${name.join('.')}' was added with value: ${stringify(value.valueAfter)}`,
   deleted: (name) => `Property '${name.join('.')}' was deleted`,
-  changed: (name, value) => `Property '${name.join('.')}' was changed from ${stringify(value.valueBefore)} to ${stringify(value.valueAfter)}`,
-  nested: (name, value, fn) => fn(value, name),
+  changed: (name, { value }) => `Property '${name.join('.')}' was changed from ${stringify(value.valueBefore)} to ${stringify(value.valueAfter)}`,
+  nested: (name, { children }, fn) => fn(children, name),
 };
 
 export default (tree) => {
@@ -33,10 +33,10 @@ export default (tree) => {
     const filteredNode = node.filter(({ state }) => state !== 'unchanged');
 
     const newItem = filteredNode.map((item) => {
-      const { name, state, value } = item;
+      const { name, state } = item;
       const newNames = [...names, name];
 
-      return decorators[state](newNames, value, iter);
+      return decorators[state](newNames, item, iter);
     });
 
     return [newItem.join('\n')];
