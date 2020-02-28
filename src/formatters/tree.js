@@ -21,7 +21,7 @@ const stringify = (value, spaces) => {
     },
     {
       check: (obj) => !_.isObject(obj),
-      format: (obj) => _.identity(obj),
+      format: _.identity,
     },
   ];
 
