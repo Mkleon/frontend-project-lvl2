@@ -35,7 +35,7 @@ const decorators = {
   deleted: ({ name, value }, level) => commonDecorator('-', name, value.valueBefore, level),
   changed: ({ name, value }, level) => [commonDecorator('+', name, value.valueAfter, level), commonDecorator('-', name, value.valueBefore, level)].join('\n'),
   unchanged: ({ name, value }, level) => commonDecorator(' ', name, value.valueBefore, level),
-  nested: ({ name, value }, level, fn) => `${createSpaces(level)}  ${name}: ${fn(value, level + 1)}`,
+  nested: ({ name, children }, level, fn) => `${createSpaces(level)}  ${name}: ${fn(children, level + 1)}`,
 };
 
 export default (tree) => {
