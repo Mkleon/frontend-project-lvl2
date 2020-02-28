@@ -5,33 +5,33 @@ import getContent from './parsers';
 import render from './formatters';
 
 const getState = (name, firstConfig, secondConfig) => {
-  const getValue = (prop) => ({ value: { valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] } });
+  const getItem = (prop) => ({ value: { valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] } });
 
   const states = [
     {
       state: 'added',
       check: (prop) => !_.has(firstConfig, prop) && _.has(secondConfig, prop),
-      getValue,
+      getItem,
     },
     {
       state: 'deleted',
       check: (prop) => _.has(firstConfig, prop) && !_.has(secondConfig, prop),
-      getValue,
+      getItem,
     },
     {
       state: 'nested',
       check: (prop) => _.isObject(firstConfig[prop]) && _.isObject(secondConfig[prop]),
-      getValue: (prop, fn) => ({ children: fn(firstConfig[prop], secondConfig[prop]) }),
+      getItem: (prop, fn) => ({ children: fn(firstConfig[prop], secondConfig[prop]) }),
     },
     {
       state: 'unchanged',
       check: (prop) => firstConfig[prop] === secondConfig[prop],
-      getValue,
+      getItem,
     },
     {
       state: 'changed',
       check: (prop) => firstConfig[prop] !== secondConfig[prop],
-      getValue,
+      getItem,
     },
   ];
 
@@ -43,8 +43,8 @@ const buildAST = (firstConfig, secondConfig) => {
   const sortedProps = allUniqProps.slice().sort();
 
   const ast = sortedProps.map((name) => {
-    const { state, getValue } = getState(name, firstConfig, secondConfig);
-    const newItem = getValue(name, buildAST);
+    const { state, getItem } = getState(name, firstConfig, secondConfig);
+    const newItem = getItem(name, buildAST);
 
     return { name, state, ...newItem };
   });
