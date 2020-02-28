@@ -5,7 +5,7 @@ import getContent from './parsers';
 import render from './formatters';
 
 const getState = (name, firstConfig, secondConfig) => {
-  const getValue = (prop) => ({ valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] });
+  const getValue = (prop) => ({ value: { valueBefore: firstConfig[prop], valueAfter: secondConfig[prop] } });
 
   const states = [
     {
@@ -21,7 +21,7 @@ const getState = (name, firstConfig, secondConfig) => {
     {
       state: 'nested',
       check: (prop) => _.isObject(firstConfig[prop]) && _.isObject(secondConfig[prop]),
-      getValue: (prop, fn) => fn(firstConfig[prop], secondConfig[prop]),
+      getValue: (prop, fn) => ({ children: fn(firstConfig[prop], secondConfig[prop]) }),
     },
     {
       state: 'unchanged',
@@ -44,10 +44,11 @@ const buildAST = (firstConfig, secondConfig) => {
 
   const ast = sortedProps.map((name) => {
     const { state, getValue } = getState(name, firstConfig, secondConfig);
+    const newItem = getValue(name, buildAST);
 
-    return { name, state, value: getValue(name, buildAST) };
+    return { name, state, ...newItem };
   });
-
+  console.log(ast);
   return ast;
 };
 
