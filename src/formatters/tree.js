@@ -33,17 +33,17 @@ const commonDecorator = (sign, name, value, level) => `${createSpaces(level)}${s
 const decorators = {
   added: ({ name, value }, level) => commonDecorator('+', name, value.valueAfter, level),
   deleted: ({ name, value }, level) => commonDecorator('-', name, value.valueBefore, level),
-  changed: ({ name, value }, level) => [commonDecorator('+', name, value.valueAfter, level), commonDecorator('-', name, value.valueBefore, level)].join('\n'),
+  changed: ({ name, value }, level) => [commonDecorator('+', name, value.valueAfter, level), commonDecorator('-', name, value.valueBefore, level)],
   unchanged: ({ name, value }, level) => commonDecorator(' ', name, value.valueBefore, level),
   nested: ({ name, children }, level, fn) => `${createSpaces(level)}  ${name}: ${fn(children, level + 1)}`,
 };
 
 export default (tree) => {
   const iter = (node, level = 1) => {
-    const newItem = node.map((item) => decorators[item.state](item, level, iter));
+    const newItem = node.map((item) => decorators[item.state](item, level, iter)).flat();
 
-    return ['{', ...newItem, `${createSpacesBeforeBracket(level)}}`].join('\n');
+    return ['{', ...newItem, `${createSpacesBeforeBracket(level)}}`].flat().join('\n');
   };
 
-  return [iter(tree)].join('\n');
+  return iter(tree);
 };
