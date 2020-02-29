@@ -32,15 +32,13 @@ export default (tree) => {
   const iter = (node, names) => {
     const filteredNode = node.filter(({ state }) => state !== 'unchanged');
 
-    const newItem = filteredNode.map((item) => {
+    return filteredNode.map((item) => {
       const { name, state } = item;
       const newNames = [...names, name];
 
       return decorators[state](newNames, item, iter);
     });
-
-    return [newItem.join('\n')];
   };
 
-  return iter(tree, []).join('\n');
+  return iter(tree, []).flat().join('\n');
 };
